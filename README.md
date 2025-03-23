@@ -1,16 +1,30 @@
-# posture_app_2
+# Posture Detector App
 
-A new Flutter project.
+A Flutter app that detects and alerts users about bad posture using MQTT and ESP32.
 
-## Getting Started
+## Features
+- Real-time posture status updates.
+- Notifications for bad posture.
+- MQTT integration for communication with ESP32.
 
-This project is a starting point for a Flutter application.
+## Setup
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/your-repo-name.git
 
-A few resources to get you started if this is your first Flutter project:
+2. Install dependancies:
+    ```bash
+    flutter pub get
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+3. Run the app
+    ```bash
+    flutter run
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Dependencies
+
+- [`mqtt_client`](https://pub.dev/packages/mqtt_client): For MQTT communication.
+- [`flutter_local_notifications`](https://pub.dev/packages/flutter_local_notifications): For showing notifications.
+
+## License
+
+This project is licensed under the MIT License.
