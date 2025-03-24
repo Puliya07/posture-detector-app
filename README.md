@@ -1,30 +1,39 @@
 # Posture Detector App
 
-A Flutter app that detects and alerts users about bad posture using MQTT and ESP32.
+A Flutter app that monitors and improves user posture by:
+- Receiving real-time sensor data via MQTT from ESP32
+- Providing instant feedback on posture quality
+- Offering customizable alerts and historical trend analysis
 
-## Features
-- Real-time posture status updates.
-- Notifications for bad posture.
-- MQTT integration for communication with ESP32.
+## ✨ Key Features
 
-## Setup
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/your-username/your-repo-name.git
+- **Real-time Posture Monitoring**
+  - Continuous angle measurement
+  - Instant posture classification (Good/Needs Improvement/Bad)
+  
+- **Smart Notifications**
+  - Visual status updates
+  - Customizable sound/vibration alerts
+  - Configurable sensitivity thresholds
 
-2. Install dependancies:
-    ```bash
-    flutter pub get
+- **Data Integration**
+  - Secure MQTT communication with ESP32
+  - Local data persistence
+  - Posture history tracking
 
-3. Run the app
-    ```bash
-    flutter run
+## 🛠️ Setup Instructions
 
-## Dependencies
+### Hardware Requirements
+- ESP32 with IMU sensor
+- MQTT broker (e.g., HiveMQ Cloud)
 
-- [`mqtt_client`](https://pub.dev/packages/mqtt_client): For MQTT communication.
-- [`flutter_local_notifications`](https://pub.dev/packages/flutter_local_notifications): For showing notifications.
+### App Installation
+```bash
+# Clone repository
+git clone https://github.com/your-username/posture-detector-app.git
 
-## License
+# Install dependencies
+flutter pub get
 
-This project is licensed under the MIT License.
+# Run the app (choose your device)
+flutter run
