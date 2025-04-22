@@ -31,10 +31,12 @@ class PostureScreenState extends State<PostureScreen> {
   @override
   void initState() {
     super.initState();
+    _audioPlayer.setVolume(1.0);
+    _audioPlayer.setSource(AssetSource('sounds/alert.mp3'));
     _connectToMqtt();
   }
 
-  Future<void> _connectToMqtt() async {
+  Future<void> _connectToMqtt({int retryCount=0, int maxRetries = 5}) async {
     _client = MqttServerClient('218638469dfa429db85a2e1df0b4f8c7.s1.eu.hivemq.cloud', 'flutter_client');
     _client.port = 8883;
     _client.keepAlivePeriod = 20;
@@ -52,6 +54,11 @@ class PostureScreenState extends State<PostureScreen> {
       .startClean()
       .withWillQos(MqttQos.atMostOnce)
       .authenticateAs('hivemq.webclient.1742574310428', '61b!5CgSPQc>xqu.3@JM');
+    
+    if (retryCount >= maxRetries){
+      updatePostureStatus("Failed to connect to MQTT broket after $maxRetries attempts.");
+      return;
+    }
 
     try {
       _logger.info('Attempting to connect to MQTT broker...');
@@ -60,8 +67,8 @@ class PostureScreenState extends State<PostureScreen> {
       _logger.severe("Connection failed: $e");
       _client.disconnect();
       updatePostureStatus("Connection Failed. Retyring...");
-      await Future.delayed(Duration(seconds: 5));
-      _connectToMqtt();
+      await Future.delayed(Duration(seconds: 2 * (retryCount + 1)));
+      _connectToMqtt(retryCount: retryCount + 1, maxRetries: maxRetries);
     }
   }
 
@@ -90,8 +97,14 @@ class PostureScreenState extends State<PostureScreen> {
   }
 
   Future<void> _triggerVibration() async {
-    if (await Vibration.hasVibrator()) {
-      Vibration.vibrate(duration: 500);
+    if (await Vibration.hasVibrator() ?? false) {
+      try{
+        await Vibration.vibrate(duration: 500);
+      } catch (e) {
+        _logger.warning("Vibration failed: $e");
+      }
+    } else{
+      _logger.info("Device does not support vibration");
     }
   }
   void _onDisconnected() {
@@ -103,7 +116,11 @@ class PostureScreenState extends State<PostureScreen> {
   }
 
   Future<void> _playAlertSound() async{
-    await _audioPlayer.play(UrlSource('assets/sounds/alert.mp3'));
+    try{
+      await _audioPlayer.play(AssetSource('sounds/alert.mp3'));
+    } catch (e) {
+      _logger.severe("Failed to play alert sound: $e");
+    }
   }
 
   @override
@@ -127,7 +144,9 @@ class PostureScreenState extends State<PostureScreen> {
         ],
       ),
       body: Center(
-        child: Column(
+        child: _client.connectionStatus?.state == MqttConnectionState.connecting
+        ? CircularProgressIndicator()
+        : Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
@@ -136,7 +155,11 @@ class PostureScreenState extends State<PostureScreen> {
             ),
             Text(
               postureStatus,
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color:Colors.white),
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: postureStatus.contains("Incorrect") ? Colors.red : Colors.green,
+              ),
             ),
           ],
         ),
